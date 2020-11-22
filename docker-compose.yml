@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  web:
+    image: nginx
+    volumes:
+      - ./nginx/app.conf:/etc/nginx/nginx.conf
+    depends_on: 
+      - appnode
+    ports:
+      - 80:80
+  db:
+    image: postgres 
+    restart: always
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432      
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL}"
+      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_DEFAULT_PASSWORD}"
+    ports:
+      - 5555:80
+    depends_on:
+      - db
+  appnode:
+    image: caduswd/app-node-dockerizado:latest
+    build: .
+    ports:
+      - 3090
+    depends_on:
+      - db
